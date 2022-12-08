@@ -1,21 +1,33 @@
 from django.shortcuts import HttpResponse
+
 import requests
 import json
 
 
-# Store Credentials
+
+# Store credentials
 STORE_HASH = "b5ajmj9rbq"
 
 
+
+
+
+
+
 # Customer credentials
-emailOfCustomer = "tes6611@gmail.com"
+emailOfCustomer = "faz12222@gmail.com"
+
 passwordOfCustomer = "muhammedfazil123#"
 
 
 
-#--------------------------------------------------------------------------------------------------------
-# CREATEING CUSTOMER IN BC WITH DUMMY DATA
 
+
+
+CART_ID = "13590f26-ab54-400e-b4f5-426f286539c0"
+
+#--------------------------------------------------------------------------------------------------------
+#<1> CREATEING CUSTOMER IN BC WITH DUMMY DATA
 
 def createCustomerBc(request):
     url = f"https://api.bigcommerce.com/stores/{STORE_HASH}/v3/customers"
@@ -79,7 +91,10 @@ def createCustomerBc(request):
     json_object = json.loads(res)
     customer_id = json_object['data'][0]['addresses'][0]['customer_id']
     print('customer id:',type(customer_id))
-    return customer_id
+    print('CUSTOMER CREATED IN BIGCOMMERCE',customer_id)
+    return HttpResponse(customer_id)
+
+
 
 
 
@@ -119,17 +134,20 @@ def validateCustomerBc(request):
 def createCartInBc(request):
     url = f"https://api.bigcommerce.com/stores/{STORE_HASH}/v3/carts"
 
-    id = f'{createCustomerBc(request)}'
-    print('second function',id)
+    customer_id = 17238
+    product_id = 479
+    quantity = 10
+    list_price = 10
+    name = "calendar"
 
     payload = {
-        "customer_id": 17134,
+        "customer_id": customer_id,
         "line_items": [
             {
-                "quantity": 2,
-                "product_id": 481,
-                "list_price": 5,
-                "name": "calendar"
+                "quantity": quantity,
+                "product_id": product_id,
+                "list_price": list_price,
+                "name": name
             }
         ],
         "channel_id": 1,
@@ -144,7 +162,7 @@ def createCartInBc(request):
 
     response = requests.request("POST", url, json=payload, headers=headers)
 
-    print(response.text)
+    print('CART CREATED IN BIGCOMMERCE:',response.text)
 
     return HttpResponse(response)
 
@@ -164,31 +182,43 @@ def createCartRedirectUrl(request):
 
     print(response.text)
     
-    return HttpResponse('create cart redirect url')
-
-
-
-
-
-
-
-
-
-#Create an order in bigcommerce using cart id
-def createOrderBc(request):
-    url = "https://api.bigcommerce.com/stores/{STORE_HASH}/v3/checkouts/{CART_ID}/orders"
-
-    headers = {
-        "Content-Type": "application/json",
-        "Accept": "application/json",
-        "X-Auth-Token": "redptv84kmlgfed97l7jroa0mdknfgc"
-    }
-
-    response = requests.request("POST", url, headers=headers)
-
-    print(response.text)
-
     return HttpResponse(response)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# Bigcommerce is creating order from chekout
+
+# #Create an order in bigcommerce using cart id
+# def createOrderBc(request):
+#     url = "https://api.bigcommerce.com/stores/{STORE_HASH}/v3/checkouts/{CART_ID}/orders"
+
+#     headers = {
+#         "Content-Type": "application/json",
+#         "Accept": "application/json",
+#         "X-Auth-Token": "redptv84kmlgfed97l7jroa0mdknfgc"
+#     }
+
+#     response = requests.request("POST", url, headers=headers)
+
+#     print(response.text)
+
+#     return HttpResponse(response)
 
 
 
