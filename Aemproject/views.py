@@ -2,32 +2,34 @@ from django.shortcuts import HttpResponse
 
 import requests
 import json
+import os
+
+
+# STORE CREDENTIALS 
+STORE_HASH = os.environ.get('STORE_HASH')
+XAUTH_TOKEN = os.environ.get('XAUTH_TOKEN')
+CONTENT_TYPE = os.environ.get('CONTENT_TYPE')
+ACCEPT_TYPE = os.environ.get('ACCEPT_TYPE')
 
 
 
-# Store credentials
-STORE_HASH = "b5ajmj9rbq"
 
 
-
-
-
-
-
-# Customer credentials
-emailOfCustomer = "faz12222@gmail.com"
-
+#CUSTOMER CREDENTIALS
+emailOfCustomer = "faz12221277@gmail.com"
 passwordOfCustomer = "muhammedfazil123#"
-
-
 
 
 
 
 CART_ID = "13590f26-ab54-400e-b4f5-426f286539c0"
 
-#--------------------------------------------------------------------------------------------------------
-#<1> CREATEING CUSTOMER IN BC WITH DUMMY DATA
+
+
+#--------------------\------------------------------------------------------------------------------------
+#<1> CREATEING CUSTOMER IN BC USING DUMMY DATA
+# CREATING ACCOUNT IN BC USING THE DATA GETTING FROM AEM 
+
 
 def createCustomerBc(request):
     url = f"https://api.bigcommerce.com/stores/{STORE_HASH}/v3/customers"
@@ -80,7 +82,7 @@ def createCustomerBc(request):
         }
     ]
 
-    headers = {"Content-Type": "application/json","X-Auth-Token": "redptv84kmlgfed97l7jroa0mdknfgc"}
+    headers = {"Content-Type":  CONTENT_TYPE,"X-Auth-Token":XAUTH_TOKEN}
 
     response = requests.request("POST", url, json=payload, headers=headers)
     res = response.text
@@ -90,10 +92,11 @@ def createCustomerBc(request):
     #converted string to json 
     json_object = json.loads(res)
     customer_id = json_object['data'][0]['addresses'][0]['customer_id']
+
     print('customer id:',type(customer_id))
     print('CUSTOMER CREATED IN BIGCOMMERCE',customer_id)
-    return HttpResponse(customer_id)
 
+    return HttpResponse(customer_id)
 
 
 
@@ -103,19 +106,14 @@ def createCustomerBc(request):
 #Validate a customer credentials
 #If only valid credentials it shows valid "true" otherwise "false"
 #Refer https://developer.bigcommerce.com/api-reference/3d731215a3dcb-validate-a-customer-credentials
+
 def validateCustomerBc(request):
     url = f"https://api.bigcommerce.com/stores/{STORE_HASH}/v3/customers/validate-credentials"
 
-    payload = {
-        "email": emailOfCustomer,
-        "password": passwordOfCustomer,
-        "channel_id": 1
-    }
+    payload = {"email": emailOfCustomer,"password": passwordOfCustomer,"channel_id": 1}
 
-    headers = {
-        "Content-Type": "application/json",
-        "X-Auth-Token": "redptv84kmlgfed97l7jroa0mdknfgc"
-    }
+
+    headers = {"Content-Type":  CONTENT_TYPE,"X-Auth-Token":XAUTH_TOKEN}
 
     response = requests.request("POST", url, json=payload, headers=headers)
 
@@ -123,9 +121,10 @@ def validateCustomerBc(request):
     resData = response.text
     print(type(resData))
     print('data',resData)
+
     return HttpResponse(resData)
     
-
+ 
   
 
 
@@ -139,6 +138,7 @@ def createCartInBc(request):
     quantity = 10
     list_price = 10
     name = "calendar"
+
 
     payload = {
         "customer_id": customer_id,
@@ -154,11 +154,8 @@ def createCartInBc(request):
         # "currency": {"code": "USD"},
         # "locale": "en-US" 
     }
-    headers = {
-        "Content-Type": "application/json",
-        "Accept": "application/json",
-        "X-Auth-Token": "redptv84kmlgfed97l7jroa0mdknfgc"
-    }
+    
+    headers = {"Content-Type": CONTENT_TYPE,"Accept": ACCEPT_TYPE,"X-Auth-Token": XAUTH_TOKEN}
 
     response = requests.request("POST", url, json=payload, headers=headers)
 
@@ -168,15 +165,12 @@ def createCartInBc(request):
 
 
 
-#Creates a Cart redirect URL 
+#Creates a Cart,Chekout Redirect URL
+
 def createCartRedirectUrl(request):
     url = f"https://api.bigcommerce.com/stores/{STORE_HASH}/v3/carts/{CART_ID}/redirect_urls"
 
-    headers = {
-        "Content-Type": "application/json",
-        "Accept": "application/json",
-        "X-Auth-Token": "redptv84kmlgfed97l7jroa0mdknfgc"
-    }
+    headers = {"Content-Type": CONTENT_TYPE,"Accept": ACCEPT_TYPE,"X-Auth-Token": XAUTH_TOKEN}
 
     response = requests.request("POST", url, headers=headers)
 
@@ -202,23 +196,7 @@ def createCartRedirectUrl(request):
 
 
 
-# Bigcommerce is creating order from chekout
 
-# #Create an order in bigcommerce using cart id
-# def createOrderBc(request):
-#     url = "https://api.bigcommerce.com/stores/{STORE_HASH}/v3/checkouts/{CART_ID}/orders"
-
-#     headers = {
-#         "Content-Type": "application/json",
-#         "Accept": "application/json",
-#         "X-Auth-Token": "redptv84kmlgfed97l7jroa0mdknfgc"
-#     }
-
-#     response = requests.request("POST", url, headers=headers)
-
-#     print(response.text)
-
-#     return HttpResponse(response)
 
 
 
