@@ -5,30 +5,25 @@ import json
 import os
 
 
+
 # STORE CREDENTIALS 
 STORE_HASH = os.environ.get('STORE_HASH')
 XAUTH_TOKEN = os.environ.get('XAUTH_TOKEN')
 CONTENT_TYPE = os.environ.get('CONTENT_TYPE')
-ACCEPT_TYPE = os.environ.get('ACCEPT_TYPE')
 
 
 
 
 
 #CUSTOMER CREDENTIALS
-emailOfCustomer = "faz12221277@gmail.com"
-passwordOfCustomer = "muhammedfazil123#"
+emailOfCustomer = "fazil@gmail.com"
+passwordOfCustomer = "faz@1234522"
 
 
 
 
-CART_ID = "13590f26-ab54-400e-b4f5-426f286539c0"
 
-
-
-#--------------------\------------------------------------------------------------------------------------
-#<1> CREATEING CUSTOMER IN BC USING DUMMY DATA
-# CREATING ACCOUNT IN BC USING THE DATA GETTING FROM AEM 
+''' CREATEING  CUSTOMER IN BIGCOMMERCE WITH THE DATA GETTING FROM AEM   '''
 
 
 def createCustomerBc(request):
@@ -85,18 +80,45 @@ def createCustomerBc(request):
     headers = {"Content-Type":  CONTENT_TYPE,"X-Auth-Token":XAUTH_TOKEN}
 
     response = requests.request("POST", url, json=payload, headers=headers)
+    
     res = response.text
-    print('Customer created in bc',)
-    print('Response data type',type(res))
+
 
     #converted string to json 
     json_object = json.loads(res)
+
+
     customer_id = json_object['data'][0]['addresses'][0]['customer_id']
 
-    print('customer id:',type(customer_id))
-    print('CUSTOMER CREATED IN BIGCOMMERCE',customer_id)
 
-    return HttpResponse(customer_id)
+    # PRODUCT DETAILS FOR CREATING CART IN BIGCOMMERCE 
+    product_id = 482
+    quantity = 10
+    list_price = 12
+    name = 'calender'
+    
+    customerData = {
+          'customer_id':customer_id,
+          'product_id':product_id,
+          'quantity':quantity,
+          'list_price':list_price,
+          'name':name
+    }
+
+    return customerData
+
+
+
+# GET PRODUCT DETAILS THROUGH API FOR CREATEING CART 
+def getProductDetails(request):
+    print('getting product details')
+    return HttpResponse('product details')
+
+
+
+
+
+
 
 
 
@@ -132,16 +154,22 @@ def validateCustomerBc(request):
 # #CREATE CART IN BIGCOMMERCE 
 def createCartInBc(request):
     url = f"https://api.bigcommerce.com/stores/{STORE_HASH}/v3/carts"
+   
+    customerProductData = createCustomerBc(request)
 
-    customer_id = 17238
-    product_id = 479
-    quantity = 10
-    list_price = 10
-    name = "calendar"
+
+    customerId = customerProductData['customer_id']
+    product_id = customerProductData['product_id']
+    quantity = customerProductData['quantity']
+    list_price = customerProductData['list_price']
+    name = customerProductData['name']
+    
+
+    channel_id = 1
 
 
     payload = {
-        "customer_id": customer_id,
+        "customer_id": customerId,
         "line_items": [
             {
                 "quantity": quantity,
@@ -150,27 +178,37 @@ def createCartInBc(request):
                 "name": name
             }
         ],
-        "channel_id": 1,
+        "channel_id": channel_id,
         # "currency": {"code": "USD"},
         # "locale": "en-US" 
     }
     
-    headers = {"Content-Type": CONTENT_TYPE,"Accept": ACCEPT_TYPE,"X-Auth-Token": XAUTH_TOKEN}
+    headers = {"Content-Type": CONTENT_TYPE,"Accept": 'application/json',"X-Auth-Token": XAUTH_TOKEN}
 
     response = requests.request("POST", url, json=payload, headers=headers)
 
-    print('CART CREATED IN BIGCOMMERCE:',response.text)
+    cartDetails = response.text
+    
+    json_object = json.loads(cartDetails)
 
-    return HttpResponse(response)
+    cartId = json_object['data']['id']
+
+    return cartId
+
+   
 
 
 
 #Creates a Cart,Chekout Redirect URL
-
 def createCartRedirectUrl(request):
-    url = f"https://api.bigcommerce.com/stores/{STORE_HASH}/v3/carts/{CART_ID}/redirect_urls"
 
-    headers = {"Content-Type": CONTENT_TYPE,"Accept": ACCEPT_TYPE,"X-Auth-Token": XAUTH_TOKEN}
+    cart_Id = createCartInBc(request)
+
+    print('third function getting cartid',cart_Id)
+    
+    url = f"https://api.bigcommerce.com/stores/{STORE_HASH}/v3/carts/{cart_Id}/redirect_urls"
+
+    headers = {"Content-Type": CONTENT_TYPE,"Accept": 'application/json',"X-Auth-Token": XAUTH_TOKEN}
 
     response = requests.request("POST", url, headers=headers)
 

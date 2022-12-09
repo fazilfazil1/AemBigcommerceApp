@@ -19,9 +19,9 @@ from . import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('',views.createCustomerBc,name='createCustomerBc'),
-    path('login/',views.validateCustomerBc,name='validateCustomerBc'),
-    path('cart/',views.createCartInBc,name='createCartInBc'),
+    # path('',views.createCustomerBc,name='createCustomerBc'),
+    # path('login/',views.validateCustomerBc,name='validateCustomerBc'),
+    # path('cart/',views.createCartInBc,name='createCartInBc'),
     path('redirect/',views.createCartRedirectUrl,name='createOrderBc'),
 
     # path('order/',views.createOrderBc,name='createOrderBc')
