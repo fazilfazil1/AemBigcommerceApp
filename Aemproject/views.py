@@ -1,4 +1,5 @@
 from django.shortcuts import HttpResponse
+from urllib.parse import urlparse, parse_qs
 
 import requests
 import json
@@ -7,6 +8,7 @@ import os
 
 from django.shortcuts import render
 
+from django.shortcuts import redirect
 
 
 # STORE CREDENTIALS 
@@ -14,231 +16,9 @@ STORE_HASH = os.environ.get('STORE_HASH')
 XAUTH_TOKEN = os.environ.get('XAUTH_TOKEN')
 CONTENT_TYPE = os.environ.get('CONTENT_TYPE')
 
+# Headers
+headers = {"Content-Type":  CONTENT_TYPE,"X-Auth-Token":XAUTH_TOKEN}
 
-
-
-
-#CUSTOMER CREDENTIALS
-# emailOfCustomer = "muhammedfazil1121120@gmail.com"
-# passwordOfCustomer = "faz@1234522"
-
-
-
-
-
-''' CREATEING  CUSTOMER IN BIGCOMMERCE WITH THE DATA GETTING FROM AEM   '''
-
-
-# def createCustomerBc(request):
-#     url = f"https://api.bigcommerce.com/stores/{STORE_HASH}/v3/customers"
-
-#     payload = [
-#         {
-#             "email": emailOfCustomer,
-#             "first_name": "muhammed",
-#             "last_name": "fazil",
-#             "company": "abc",
-#             "phone": "8590892011",
-#             "notes": "note1",
-#             "tax_exempt_category": "string",
-#             "customer_group_id": 0,
-#             "addresses": [
-#                 {
-#                     "address1": "Addr 1",
-#                     "address2": "",
-#                     "address_type": "residential",
-#                     "city": "San Francisco",
-#                     "company": "History",
-#                     "country_code": "US",
-#                     "first_name": "Ronald",
-#                     "last_name": "Swimmer",
-#                     "phone": "707070707",
-#                     "postal_code": "33333",
-#                     "state_or_province": "California",
-#                     "form_fields": [
-#                         {
-#                             "name": "test",
-#                             "value": "test"
-#                         }
-#                     ]
-#                 }
-#             ],
-#             "authentication": {
-#                 "force_password_reset": True,
-#                 "new_password": passwordOfCustomer
-#             },
-#             "accepts_product_review_abandoned_cart_emails": True,
-#             "store_credit_amounts": [{"amount": 43.15}],
-#             "origin_channel_id": 1,
-#             "channel_ids": [1],
-#             "form_fields": [
-#                 {
-#                     "name": "form name",
-#                     "value": "form value"
-#                 }
-#             ]
-#         }
-#     ]
-
-#     headers = {"Content-Type":  CONTENT_TYPE,"X-Auth-Token":XAUTH_TOKEN}
-
-#     response = requests.request("POST", url, json=payload, headers=headers)
-    
-#     res = response.text
-
-
-#     #converted string to json 
-#     json_object = json.loads(res)
-
-
-#     customer_id = json_object['data'][0]['addresses'][0]['customer_id']
-
-
-#     # PRODUCT DETAILS FOR CREATING CART IN BIGCOMMERCE 
-#     product_id = 482
-#     quantity = 10
-#     list_price = 12
-#     name = 'calender'
-    
-#     customerData = {
-#           'customer_id':customer_id,
-#           'product_id':product_id,
-#           'quantity':quantity,
-#           'list_price':list_price,
-#           'name':name
-#     }
-
-#     return customerData
-
-
-
-# GET PRODUCT DETAILS THROUGH API FOR CREATEING CART 
-# def addProductToCart(request):
-#     print('getting product details')
-#     return HttpResponse('product details')
-
-
-
-
-
-
-#VALIDATE CUSTOMER USEING CREDENTIALS
-#If only valid credentials it shows valid "true" otherwise "false"
-#Refer https://developer.bigcommerce.com/api-reference/3d731215a3dcb-validate-a-customer-credentials
-
-# def validateCustomerBc(request):
-#     url = f"https://api.bigcommerce.com/stores/{STORE_HASH}/v3/customers/validate-credentials"
-
-#     payload = {"email": emailOfCustomer,"password": passwordOfCustomer,"channel_id": 1}
-
-
-#     headers = {"Content-Type":  CONTENT_TYPE,"X-Auth-Token":XAUTH_TOKEN}
-
-#     response = requests.request("POST", url, json=payload, headers=headers)
-
-#     # store the response to variable
-#     resData = response.text
-#     print(type(resData))
-#     print('data',resData)
-
-#     return HttpResponse(resData)
-    
- 
-  
-
-
-
-# #CREATE CART IN BIGCOMMERCE 
-def createCartInBc(request):
-    print('cart created successfully fazil')
-    return HttpResponse('sdfdskfjdsk')
-    # url = f"https://api.bigcommerce.com/stores/{STORE_HASH}/v3/carts"
-   
-    # customerProductData = registerCustomerBc(request)
-
-    # print('customer222',customerProductData)
-
-
-
-
-    # customerId = customerProductData['customer_id']
-    # product_id = customerProductData['product_id']
-    # quantity = customerProductData['quantity']
-    # print(product_id,quantity,customerId)
-    # list_price = customerProductData['list_price']
-    # name = customerProductData['name']
-    
-
-    # channel_id = 1
-
-
-    # payload = {
-    #     "customer_id": customerId,
-    #     "line_items": [
-    #         {
-    #             "quantity": quantity,
-    #             "product_id": product_id,
-    #             "list_price": list_price,
-    #             "name": name
-    #         }
-    #     ],
-    #     "channel_id": channel_id,
-    #     "currency": {"code": "USD"},           
-    #     # "locale": "en-US" 
-    # }
-    
-    # headers = {"Content-Type": CONTENT_TYPE,"Accept": 'application/json',"X-Auth-Token": XAUTH_TOKEN}
-
-    # response = requests.request("POST", url, json=payload, headers=headers)
-
-    # cartDetails = response.text
-
-    # print(cartDetails)
-
-    # json_object = json.loads(cartDetails)
-
-    # cartId = json_object['data']['id']
-
-    # print('cart created',cartDetails)
-
-
-
-   
-
-
-
-#Creates a Cart,Chekout Redirect URL
-# def createCartRedirectUrl(request):
-
-#     cart_Id = createCartInBc(request)
-
-#     print('third function getting cartid',cart_Id)
-    
-#     url = f"https://api.bigcommerce.com/stores/{STORE_HASH}/v3/carts/{cart_Id}/redirect_urls"
-
-#     headers = {"Content-Type": CONTENT_TYPE,"Accept": 'application/json',"X-Auth-Token": XAUTH_TOKEN}
-
-#     response = requests.request("POST", url, headers=headers)
-
-#     res = response.text
-
-#     print('the response data 3',res)
-
-    
-#     return HttpResponse(response)
-
-
-
-
-
-
-
-
-
-
-
-
-# ==================*****************************=============================
 
 
 # Aem frontend page
@@ -246,162 +26,298 @@ def enrollcourse(request):
     return render(request,'aemfront.html')
 
 
-
-
-def getDataFromAem(request):
-     # get the email from request
-     emailCustomer = request.GET.get('email')
-     print('email of the customer:',emailCustomer)
-     # get the password from request
-     passwordCustomer = request.GET.get('pass')
-     print('password of the customer:',passwordCustomer)
-     # get the course sku or id from request
-     productSku = request.GET.get('productsku')
-     print('sku of the product:',productSku)
-
-     data = {
-        'emailOfCustomer':emailCustomer,
-        'passwordOfCustomer':passwordCustomer,
-        'productSku':productSku
-     }
-
-     return data 
      
-
-
-
-
 def enroll(request):
     if(request.method != "GET"):
         return "HO HTTP mehtod not allowed"
     else:
-        # get the email from request
-        # get the password from request
-        # get the course sku or id from request
-        getDataFromAem(request)
-        
-        # login or register the customer
-        registerCustomerBc(request)
+        # get the email,password,course sku or id from request    
+        email = request.GET.get('email')
+        password = request.GET.get('pass')
+        productsku = request.GET.get('productsku')
+        fname = request.GET.get('fname')
+        lname = request.GET.get('lname')
+          
 
-        # create cart for the customer
-        
-        createCartInBc(request)
-        
-        # createCartInBc(request)
 
+        # login or register the customer and get the customer id
+        customer_id = getBcCustomerId(email,password,fname,lname)
+        print('customer id is000222',customer_id)
         
+
+        #getting product id useing product sku
+        productId = getProductIdUsingSku(productsku)
+        
+        # create cart for the customer 
+        cartId = createCartForCustomerId(customer_id,productId)
+
         # add this product to customers cart
+        # addProductToCart(cartId,productId)
 
-     
         # redirect to bigcommerce checkout page with the above created cart
-
-
-        # print success or faliure
-
-        print(request)
-        print(request.method)
-
-        # data = {
-        #      "emailOfCustomer":emailCustomer,
-        #      "passwordCustomer":passwordCustomer,
-        #      "productSku":productSku
-        # }
-
-        return HttpResponse('jiiiii')
+        redirectUrl = createCartRedirectUrl(cartId)
+        print('cart id 912192718',redirectUrl)
+       
+        cartUrl = redirectUrl['cart_url']
+        print('323824638264832',cartUrl)
+ 
+        print(cartId)
+        
 
 
 
+        parse_result = urlparse(cartUrl)
+        print('parsed url',parse_result)
+
+        
+        dict_result = parse_qs(parse_result.query)
+                
+        print(dict_result['token'][0])  # 👉️ '10'
+        print(dict_result['id'][0])  # 👉️ 'ASC'
+
+        token = dict_result['token'][0]
+        cid = dict_result['id'][0]
+
+        url = f"https://camerastuff1.mybigcommerce.com/cart.php?action=load&id={cid}&token={token}"
+
+        return redirect(url)
 
 
 
-def registerCustomerBc(request):
-    customerDetails = getDataFromAem(request)
-    print('the customer details ',customerDetails)         
-    emailOfCustomer = customerDetails['emailOfCustomer'] 
-    passwordOfCustomer = customerDetails['passwordOfCustomer'] 
-    # productSku = customerDetails['productSku']
+# ##################################################################
+
+
+def getBcCustomerId(email,password,firstname,lastname):
     
-
     url = f"https://api.bigcommerce.com/stores/{STORE_HASH}/v3/customers"
 
-    payload = [
-        {
-            "email": emailOfCustomer,
-            "first_name": "fazil",
-            "last_name": "fazil",
-            "company": "abc",
-            "phone": "8590892011",
-            "notes": "note1",
-            "tax_exempt_category": "string",
-            "customer_group_id": 0,
-            "addresses": [
-                {
-                    "address1": "Addr 1",
-                    "address2": "",
-                    "address_type": "residential",
-                    "city": "San Francisco",
-                    "company": "History",
-                    "country_code": "US",
-                    "first_name": "Ronald",
-                    "last_name": "Swimmer",
-                    "phone": "707070707",
-                    "postal_code": "33333",
-                    "state_or_province": "California",
-                    "form_fields": [
-                        {
-                            "name": "test",
-                            "value": "test"
-                        }
-                    ]
-                }
-            ],
-            "authentication": {
-                "force_password_reset": True,
-                "new_password": passwordOfCustomer
-            },
-            "accepts_product_review_abandoned_cart_emails": True,
-            "store_credit_amounts": [{"amount": 43.15}],
-            "origin_channel_id": 1,
-            "channel_ids": [1],
-            "form_fields": [
-                {
-                    "name": "form name",
-                    "value": "form value"
-                }
-            ]
-        }
-    ]
-    headers = {"Content-Type":  CONTENT_TYPE,"X-Auth-Token":XAUTH_TOKEN}
-    response = requests.request("POST", url, json=payload, headers=headers)
+    querystring = {"email:in":email}
+
+    response = requests.request("GET", url, headers=headers, params=querystring)
+
     res = response.text
 
+    json_object = json.loads(res)
 
-    #converted string to json 
+     
+    data = json_object['data']
+
+
+    # if the data does not exists then create customer else validate the customer
+
+    if data == []:
+        print('no customer id found')
+        #Createing new customer if data is not found
+        return createNewCustomerInBc(email,password,firstname,lastname)
+    else:
+        if validateCustomerInBc(email,password):
+            return json_object['data'][0]['id']
+        else:
+            return None
+
+
+
+def validateCustomerInBc(email,password):
+    url = f"https://api.bigcommerce.com/stores/{STORE_HASH}/v3/customers/validate-credentials"
+
+    payload = {
+        "email": email,
+        "password": password,
+    }
+
+    response = requests.request("POST", url, json=payload, headers=headers)
+
+    res = response.text
+   
     json_object = json.loads(res)
 
 
-    # d = json_object['data'][0]['addresses'][0]['customer_id']
-    # print('customer id',d)
+    isValid = json_object['is_valid']
+
+    return isValid
     
-    customer_id = 124343
 
 
-    # PRODUCT DETAILS FOR CREATING CART IN BIGCOMMERCE 
-    product_id = 482
-    quantity = 10
-    list_price = 12
-    name = 'calender'
+
+
+
+
+# Register customer in bigcommerce with email and password getting from aem 
+# Function Prams : customer details in request email,pass,productsku
+# Function Returns : the response as customer created or customer already exists
+# product id,quantity,listprice,customerid,name passing to cartcreate function for createing cart
+
+def createNewCustomerInBc(email,password,firstname,lastname):
     
-    customerData = {
-          'customer_id':customer_id,
-          'product_id':product_id,
-          'quantity':quantity,
-          'list_price':list_price,
-          'name':name
+    url = f"https://api.bigcommerce.com/stores/{STORE_HASH}/v3/customers"
+    payload = [
+        {
+            "email": email,
+            "first_name": firstname,
+            "last_name": lastname,
+            "authentication": {
+                "force_password_reset": False,
+                "new_password": password
+            },
+        }
+    ]
+    response = requests.request("POST", url, json=payload, headers=headers)
+    res = response.text
+    json_object = json.loads(res)  #converted string to json 
+    print('response data555',type(json_object))
+    customer_id = json_object['data'][0]['id'] #getting customer id
+    print(customer_id,type(customer_id))
+    return customer_id
+# ##################################################################
+
+
+
+
+
+
+
+# finding product id using product sku 
+# return: product id to createcartinbc(request) for create cart
+
+def getProductIdUsingSku(productsku):
+    url = f"https://api.bigcommerce.com/stores/{STORE_HASH}/v3/catalog/products"
+
+    payload = {"sku":productsku}
+
+    response = requests.request("GET", url, headers=headers, params=payload)
+
+    res = response.text
+
+    json_object = json.loads(res)
+
+    product_id = json_object['data'][0]['id']
+
+    print('product id is:',product_id)
+
+    return product_id
+
+
+
+
+
+
+
+#CREATE CART IN BIGCOMMERCE 
+def createCartForCustomerId(customer_id,productId):
+  
+    url = f"https://api.bigcommerce.com/stores/{STORE_HASH}/v3/carts"
+
+    payload = {
+        "customer_id": customer_id,
+        "line_items": [
+            {
+                "quantity": 1,
+                "product_id": productId
+            }
+        ],
     }
+  
+    response = requests.request("POST", url, json=payload, headers=headers)
+    cartDetails = response.text
+    json_object = json.loads(cartDetails)
+    cartId = json_object['data']['id']
+    print('cart created',cartId)
+    return  cartId
 
-   
-    return customerData
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#https://developer.bigcommerce.com/api-reference/ffd397374d154-add-cart-line-items
+#ADD LINE ITEMS TO THE CART
+# ADD PRODUCT TO THE CART CREATED
+def addProductToCart(cartId,productSku):   
+    productId = getProductIdUsingSku(productSku)
+    url = f"https://api.bigcommerce.com/stores/b5ajmj9rbq/v3/carts/{cartId}/items"
+    payload = {
+        "line_items": [
+            {
+                "quantity": 1,
+                "product_id": productId,
+            }
+        ],
+    }
+    response = requests.request("POST", url, json=payload, headers=headers)
+    res = response.text
+    print('the response is:',res)
+    return cartId
+
+
+
+
+
+
+
+
+#Creates a Cart,Chekout Redirect URL
+def createCartRedirectUrl(cartId):
+
+    url = f"https://api.bigcommerce.com/stores/{STORE_HASH}/v3/carts/{cartId}/redirect_urls"
+    
+    response = requests.request("POST", url, headers=headers)
+    
+    res = response.text
+    
+    print('the response data 3',res)
+    
+    json_object = json.loads(res)     # Converting string to json
+    
+    cart_url = json_object['data']['cart_url']
+    
+    checkout_url = json_object['data']['checkout_url']
+    
+    # emdedchekout_url = json_object['data']['embedded_checkout_url']
+    
+    redirectUrl = {'cart_url':cart_url,'checkout_url':checkout_url}
+    
+    print(redirectUrl)
+    
+    # print('cart url',cart_url)
+    # print('checkout url',checkout_url)
+    # print('emdedchekout url',emdedchekout_url)
+
+
+
+
+    return redirectUrl
+
+
+
+
+
+
+
+
+
+
+
+
+    
+
+
+
+
+
+
+
+
 
 
 
