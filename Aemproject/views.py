@@ -51,36 +51,11 @@ def enroll(request):
         # create cart for the customer 
         cartId = createCartForCustomerId(customer_id,productId)
 
-        # add this product to customers cart
-        # addProductToCart(cartId,productId)
 
         # redirect to bigcommerce checkout page with the above created cart
         redirectUrl = createCartRedirectUrl(cartId)
-        print('cart id 912192718',redirectUrl)
-       
-        cartUrl = redirectUrl['cart_url']
-        print('323824638264832',cartUrl)
- 
-        print(cartId)
-        
 
-
-
-        parse_result = urlparse(cartUrl)
-        print('parsed url',parse_result)
-
-        
-        dict_result = parse_qs(parse_result.query)
-                
-        print(dict_result['token'][0])  # 👉️ '10'
-        print(dict_result['id'][0])  # 👉️ 'ASC'
-
-        token = dict_result['token'][0]
-        cid = dict_result['id'][0]
-
-        url = f"https://camerastuff1.mybigcommerce.com/cart.php?action=load&id={cid}&token={token}"
-
-        return redirect(url)
+        return redirect(redirectUrl['checkout_url'])
 
 
 
